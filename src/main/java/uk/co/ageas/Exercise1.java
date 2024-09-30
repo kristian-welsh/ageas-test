@@ -1,11 +1,10 @@
 package uk.co.ageas;
 
 import java.security.InvalidParameterException;
-import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 /**
  * Requirement :
@@ -22,6 +21,12 @@ import java.util.stream.Stream;
 
 public class Exercise1 {
 
+    private static final String IS_DIGIT = "[0-9]+";
+
+    public static String input(String input) {
+        return result(input);
+    }
+
     protected static String result(String input) {
         System.out.println("Input/Step1-->" + input);
 
@@ -31,28 +36,57 @@ public class Exercise1 {
     }
 
     private static void validateMessage(String input, int stepSize) {
-        if(!input.matches("[0-9]+")) {
+        if(!containsOnlyDigits(input)) {
             throw new InvalidParameterException("Only digits are allowed");
         }
-        if(input.length() % stepSize != 0) {
+        if(!containsValidCodepoints(input, stepSize)) {
             throw new InvalidParameterException("Digits must come in " + "pairs");
         }
     }
 
-    private static String translateMessage(String input, int stepSize) {
-        AtomicInteger evenDigitIndex = new AtomicInteger();
-        AtomicInteger secondCharacterIndex = new AtomicInteger();
-        return IntStream.generate(() -> evenDigitIndex.getAndAdd(stepSize))
-                .limit(input.length() / stepSize)// maximum value at this point is step below input length
-                .mapToObj(index -> input.subSequence(index, index + stepSize).toString())
-                .map(Integer::parseInt)
-                .filter(it -> secondCharacterIndex.getAndAdd(1) % 2 == 0)
-                .map(codePoint -> Character.toChars(codePoint)[0])
-                .map(character -> "" + character)
-                .reduce("", (acc, next) -> acc + next);
+    private static boolean containsOnlyDigits(String input) {
+        return input.matches(IS_DIGIT);
     }
 
-    public static String input(String input) {
-        return result(input);
+    private static boolean containsValidCodepoints(String input, int stepSize) {
+        return input.length() % stepSize == 0;
+    }
+
+    private static String translateMessage(String input, int stepSize) {
+        // assessor, revert the exercise 1 refactoring commit if you prefer a single stream chain
+        List<Integer> codePoints = integersFromString(input, stepSize);
+        List<Integer> everySecondCodePoint = everySecondElement(codePoints);
+        List<Character> messageCharacters = codePointsAsCharacters(everySecondCodePoint);
+        return charsToString(messageCharacters);
+    }
+
+    /** unpacks an integer sequence from the input string 123456 -> 12,34,56 */
+    private static List<Integer> integersFromString(String input, int integerLength) {
+        AtomicInteger startIndex = new AtomicInteger();
+        return IntStream.generate(() -> startIndex.getAndAdd(integerLength))
+                .boxed()
+                .limit(input.length() / integerLength)// maximum value at this point is step below input length
+                .map(index -> input.subSequence(index, index + integerLength).toString())
+                .map(Integer::parseInt)
+                .collect(Collectors.toList());
+    }
+
+    private static <T> List<T> everySecondElement(List<T> list) {
+        AtomicInteger secondElementIndex = new AtomicInteger();
+        return list.stream()
+                .filter(it -> secondElementIndex.getAndAdd(1) % 2 == 0)
+                .collect(Collectors.<T>toList());
+    }
+
+    private static List<Character> codePointsAsCharacters(List<Integer> codePoints) {
+        return codePoints.stream()
+                .map(codePoint -> Character.toChars(codePoint)[0])
+                .collect(Collectors.toList());
+    }
+
+    private static String charsToString(List<Character> characters) {
+        return characters.stream()
+                .map(character -> "" + character)
+                .reduce("", (acc, next) -> acc + next);
     }
 }
