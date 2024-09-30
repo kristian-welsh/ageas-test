@@ -1,6 +1,8 @@
 package uk.co.ageas;
 
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -25,15 +27,19 @@ public class Exercise1 {
 
         String result = "";
 
+
         // number of digits to consider at a time
-        final int stepSize = 4;
+        final int stepSize = 2;
+        // remember to validate input length is divisible by step size
 
         AtomicInteger nextIndex = new AtomicInteger();
-        Stream<CharSequence> charPairs = IntStream.generate(() -> nextIndex.getAndAdd(stepSize))
-            .filter(it -> it < input.length())
-            .mapToObj(index -> input.subSequence(index, index + stepSize));
+        Stream<CharSequence> digitPairs = IntStream.generate(() -> nextIndex.getAndAdd(stepSize))
+                .limit(input.length() / stepSize)// maximum value at this point is input length
+                .mapToObj(index -> input.subSequence(index, index + stepSize));
         //.collect(Collectors.joining());
-        System.out.println("debug value: " + charPairs.findFirst().get());
+        //String debugValue = indicies.mapToObj(it -> "" + it).collect(Collectors.joining(","));
+        String debugValue = digitPairs.collect(Collectors.joining(","));
+        System.out.println("debug value: " + debugValue);
 
         return result;
     }
