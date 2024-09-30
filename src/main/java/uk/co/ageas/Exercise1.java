@@ -25,21 +25,21 @@ public class Exercise1 {
 
         System.out.println("Input/Step1-->" + input);
 
-        String result = "";
-
 
         // number of digits to consider at a time
         final int stepSize = 2;
         // remember to validate input length is divisible by step size
 
         AtomicInteger nextIndex = new AtomicInteger();
-        Stream<CharSequence> digitPairs = IntStream.generate(() -> nextIndex.getAndAdd(stepSize))
-                .limit(input.length() / stepSize)// maximum value at this point is input length
-                .mapToObj(index -> input.subSequence(index, index + stepSize));
-        //.collect(Collectors.joining());
-        //String debugValue = indicies.mapToObj(it -> "" + it).collect(Collectors.joining(","));
-        String debugValue = digitPairs.collect(Collectors.joining(","));
-        System.out.println("debug value: " + debugValue);
+        String result = IntStream.generate(() -> nextIndex.getAndAdd(stepSize))
+                .limit(input.length() / stepSize)// maximum value at this point is step below input length
+                .mapToObj(index -> input.subSequence(index, index + stepSize).toString())
+                .map(Integer::parseInt)
+                //todo: remove every second character
+                .map(codePoint -> Character.toChars(codePoint)[0])
+                .map(character -> "" + character)
+                .reduce("", (acc, next) -> acc + next);
+        System.out.println("debug value: " + result);
 
         return result;
     }
