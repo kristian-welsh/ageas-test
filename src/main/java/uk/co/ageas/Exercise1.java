@@ -1,5 +1,6 @@
 package uk.co.ageas;
 
+import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -24,14 +25,24 @@ public class Exercise1 {
     protected static String result(String input) {
         System.out.println("Input/Step1-->" + input);
 
-        // number of digits to consider at a time
-        final int stepSize = 2;
-        // remember to validate input length is divisible by step size
+        validateMessage(input, 2);
 
+        return translateMessage(input, 2);
+    }
+
+    private static void validateMessage(String input, int stepSize) {
+        if(!input.matches("[0-9]+")) {
+            throw new InvalidParameterException("Only digits are allowed");
+        }
+        if(input.length() % stepSize != 0) {
+            throw new InvalidParameterException("Digits must come in " + "pairs");
+        }
+    }
+
+    private static String translateMessage(String input, int stepSize) {
         AtomicInteger evenDigitIndex = new AtomicInteger();
         AtomicInteger secondCharacterIndex = new AtomicInteger();
         return IntStream.generate(() -> evenDigitIndex.getAndAdd(stepSize))
-                .sequential()
                 .limit(input.length() / stepSize)// maximum value at this point is step below input length
                 .mapToObj(index -> input.subSequence(index, index + stepSize).toString())
                 .map(Integer::parseInt)
