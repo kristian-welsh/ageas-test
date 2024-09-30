@@ -3,6 +3,7 @@ package uk.co.ageas;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Requirement
@@ -32,6 +33,11 @@ public class Exercise2 {
 
         String result = "";
 
+        Optional<String> errorMessage = validate(input);
+        if(errorMessage.isPresent()) {
+            return errorMessage.get();
+        }
+
         List<String> inputBinary = Arrays.asList(input.split(""));
         Collections.reverse(inputBinary);
         //input binary is now properly big-endian
@@ -39,6 +45,14 @@ public class Exercise2 {
         result = "I am " + Integer.valueOf(reversedInput, 2);
 
         return result;
+    }
+
+    /** returns error message for given input, or empty optional if valid */
+    private static Optional<String> validate(String input) {
+        if(!input.matches("[0-1]+")) {
+            return Optional.of("Invalid input");
+        }
+        return Optional.empty();
     }
 
 
