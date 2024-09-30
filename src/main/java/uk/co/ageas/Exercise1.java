@@ -1,5 +1,9 @@
 package uk.co.ageas;
 
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 /**
  * Requirement :
  * 1. Input is a string: "6521714069616518831033" (provided)
@@ -21,7 +25,15 @@ public class Exercise1 {
 
         String result = "";
 
-        // write your logic here...
+        // number of digits to consider at a time
+        final int stepSize = 4;
+
+        AtomicInteger nextIndex = new AtomicInteger();
+        Stream<CharSequence> charPairs = IntStream.generate(() -> nextIndex.getAndAdd(stepSize))
+            .filter(it -> it < input.length())
+            .mapToObj(index -> input.subSequence(index, index + stepSize));
+        //.collect(Collectors.joining());
+        System.out.println("debug value: " + charPairs.findFirst().get());
 
         return result;
     }
