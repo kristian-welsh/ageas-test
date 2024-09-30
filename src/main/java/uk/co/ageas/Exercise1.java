@@ -22,26 +22,23 @@ import java.util.stream.Stream;
 public class Exercise1 {
 
     protected static String result(String input) {
-
         System.out.println("Input/Step1-->" + input);
-
 
         // number of digits to consider at a time
         final int stepSize = 2;
         // remember to validate input length is divisible by step size
 
-        AtomicInteger nextIndex = new AtomicInteger();
-        String result = IntStream.generate(() -> nextIndex.getAndAdd(stepSize))
+        AtomicInteger evenDigitIndex = new AtomicInteger();
+        AtomicInteger secondCharacterIndex = new AtomicInteger();
+        return IntStream.generate(() -> evenDigitIndex.getAndAdd(stepSize))
+                .sequential()
                 .limit(input.length() / stepSize)// maximum value at this point is step below input length
                 .mapToObj(index -> input.subSequence(index, index + stepSize).toString())
                 .map(Integer::parseInt)
-                //todo: remove every second character
+                .filter(it -> secondCharacterIndex.getAndAdd(1) % 2 == 0)
                 .map(codePoint -> Character.toChars(codePoint)[0])
                 .map(character -> "" + character)
                 .reduce("", (acc, next) -> acc + next);
-        System.out.println("debug value: " + result);
-
-        return result;
     }
 
     public static String input(String input) {
