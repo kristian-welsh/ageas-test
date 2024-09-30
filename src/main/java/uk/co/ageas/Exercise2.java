@@ -1,5 +1,9 @@
 package uk.co.ageas;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Requirement
  * -----------
@@ -28,7 +32,11 @@ public class Exercise2 {
 
         String result = "";
 
-        // write your logic here...
+        List<String> inputBinary = Arrays.asList(input.split(""));
+        Collections.reverse(inputBinary);
+        //input binary is now properly big-endian
+        String reversedInput = String.join("", inputBinary);
+        result = "I am " + Integer.valueOf(reversedInput, 2);
 
         return result;
     }
